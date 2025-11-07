@@ -1,0 +1,23 @@
+name: Remediation & Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      approve:
+        description: 'Approve remediation?'
+        required: true
+        default: 'true'
+
+jobs:
+  remediate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run remediation if approved
+        if: ${{ github.event.inputs.approve == 'true' }}
+        run: bash scripts/remediate.sh
+
+      - name: Build Docker image if skipped
+        if: ${{ github.event.inputs.approve == 'false' }}
+        run: docker build -t myapp:latest .
